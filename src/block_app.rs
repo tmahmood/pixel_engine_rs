@@ -3,9 +3,9 @@ use piston::input::{RenderArgs, UpdateArgs};
 use graphics::rectangle;
 use graphics::math::Vec2d;
 use piston::window::Position;
-use crate::game_engine::commands::Commands;
-use crate::{BLACK, GREEN};
-use crate::game_app::GameApp;
+use snake_game::game_engine::commands::Commands;
+use snake_game::{BLACK, GREEN};
+use snake_game::game_app::GameApp;
 
 pub struct Block {
     position: Position,

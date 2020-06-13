@@ -3,11 +3,9 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
-const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-
-pub mod block_app;
+pub const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
+pub const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+pub const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
 pub mod game_app {
     use piston::input::{RenderArgs, UpdateArgs};

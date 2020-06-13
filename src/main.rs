@@ -1,8 +1,12 @@
 extern crate snake_game;
-use snake_game::{game_engine, block_app};
+use snake_game::{game_engine};
 use snake_game::game_engine::{GameEngine};
-use snake_game::block_app::App;
 use opengl_graphics::{GlGraphics, OpenGL};
+use crate::block_app::App;
+
+pub mod block_app;
+
+
 
 fn main() {
     let opengl = OpenGL::V4_5;
