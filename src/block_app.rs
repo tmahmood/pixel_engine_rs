@@ -3,66 +3,85 @@ use piston::input::{RenderArgs, UpdateArgs};
 use graphics::rectangle;
 use graphics::math::Vec2d;
 use piston::window::Position;
-use snake_game::game_engine::commands::Commands;
+use snake_game::commands::{Commands};
 use snake_game::{BLACK, GREEN};
 use snake_game::game_app::GameApp;
+use graphics::types::Rectangle;
+use snake_game::point3d::Point3D;
+use snake_game::shapes::{ShapeKind, Shape, Block};
 
-pub struct Block {
-    position: Position,
-    color: [f32; 4],
-}
 
-impl Block {
-    pub fn get_drawing_props(&self) -> ([f32; 4], (f64, f64)) {
-        (self.color, (self.position.x as f64 * BLOCK_WIDTH , self.position.y as f64 * BLOCK_HEIGHT))
-    }
-}
-
+// most of these configurations can be loaded from config file later
 pub const WINDOW_WIDTH: i32 = 800;
 pub const WINDOW_HEIGHT: i32 = 800;
-pub const MAP_SIZE: i32 = 80;
-
+pub const MAP_SIZE: i32 = 40;
 pub const BOARD_WIDTH: f64 = 600.0;
 pub const BOARD_HEIGHT: f64 = 600.0;
 pub const BLOCK_WIDTH: f64 = BOARD_WIDTH / MAP_SIZE as f64;
 pub const BLOCK_HEIGHT: f64 = BOARD_HEIGHT / MAP_SIZE as f64;
 
 pub struct App {
-    pub gl: GlGraphics,
     pub blocks: Vec<Block>,
 }
 
 impl App {
-    pub fn new(gl: GlGraphics) -> Self {
+    pub fn new() -> Self {
         App {
-            gl,
-            blocks: Vec::new()
+            blocks: vec![
+                Block::new(
+                    [32.0, 32.0],
+                    GREEN,
+                    3.0,
+                    0.0,
+                )
+            ]
         }
     }
 }
 
 impl GameApp for App {
-    fn render(&mut self, args: &RenderArgs) {
-        use graphics::*;
-        let square = rectangle::rectangle_by_corners(0.0, 0.0, BLOCK_WIDTH, BLOCK_HEIGHT);
-        let background = rectangle::rectangle_by_corners(0.0, 0.0, BOARD_WIDTH, BOARD_HEIGHT);
-        let blocks = &self.blocks;
-        self.gl.draw(args.viewport(), |c, gl| {
-            // Clear the screen.
-            clear(BLACK, gl);
-            rectangle(GREEN, background, c.transform.trans(0.0, 0.0), gl);
-            blocks.iter().for_each(|block| {
-                let (color, (x, y)) = block.get_drawing_props();
-                let transform = c.transform.trans(x, y);
-                rectangle(color, square, transform, gl);
-            });
-        });
+
+    fn get_drawables(&self, args: &RenderArgs) -> Vec<(Vec<f64>, ShapeKind)> {
+        // what we want to draw?!
+        let mut points = Vec::new();
+        for block in &self.blocks {
+            points.push((block.get_shape_info(), block.get_shape_kind()));
+        }
+        points
     }
 
     fn update(&mut self, args: &UpdateArgs) {
-        // Rotate 2 radians per second.
+        for block in &mut self.blocks {
+            let p = block.get_shape_info();
+            let [dx, dy] = block.get_movement_rate();
+            block.set_shape_position(
+                p[0] + (dx * args.dt as f32) as f64,
+                p[1] + (dy * args.dt as f32) as f64
+            );
+        }
     }
 
+    fn get_window_width(&self) -> i32 {
+        WINDOW_WIDTH
+    }
+    fn get_window_height(&self) -> i32 {
+        WINDOW_HEIGHT
+    }
+    fn get_map_size(&self) -> i32 {
+        MAP_SIZE
+    }
+    fn get_board_width(&self) -> f64 {
+        BOARD_WIDTH
+    }
+    fn get_board_height(&self) -> f64 {
+        BOARD_HEIGHT
+    }
+    fn get_block_width(&self) -> f64 {
+        BLOCK_WIDTH
+    }
+    fn get_block_height(&self) -> f64 {
+        BLOCK_HEIGHT
+    }
 }
 
 impl Commands for App {

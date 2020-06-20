@@ -1,7 +1,7 @@
 extern crate snake_game;
 use snake_game::{game_engine};
 use snake_game::game_engine::{GameEngine};
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::{OpenGL};
 use crate::block_app::App;
 
 pub mod block_app;
@@ -16,6 +16,6 @@ fn main() {
             block_app::WINDOW_HEIGHT as f64
         ], opengl
     );
-    let mut app = App::new(GlGraphics::new(opengl));
+    let mut app = App::new();
     ge.game_loop(&mut app);
 }
