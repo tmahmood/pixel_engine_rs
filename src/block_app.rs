@@ -3,12 +3,11 @@ use piston::input::{RenderArgs, UpdateArgs};
 use graphics::rectangle;
 use graphics::math::Vec2d;
 use piston::window::Position;
-use snake_game::commands::{Commands};
-use snake_game::{BLACK, GREEN};
-use snake_game::game_app::GameApp;
+use snake_game::{BLACK, GREEN, RED};
 use graphics::types::Rectangle;
-use snake_game::point3d::Point3D;
-use snake_game::shapes::{ShapeKind, Shape, Block};
+use std::collections::HashMap;
+use snake_game::game_engine::shapes::{Block, ShapeKind};
+use snake_game::game_engine::game_app::GameApp;
 
 
 // most of these configurations can be loaded from config file later
@@ -20,44 +19,66 @@ pub const BOARD_HEIGHT: f64 = 600.0;
 pub const BLOCK_WIDTH: f64 = BOARD_WIDTH / MAP_SIZE as f64;
 pub const BLOCK_HEIGHT: f64 = BOARD_HEIGHT / MAP_SIZE as f64;
 
+
 pub struct App {
     pub blocks: Vec<Block>,
+    pub point_list: Vec<Vec<f64>>,
 }
 
 impl App {
     pub fn new() -> Self {
+        let mut point_list = vec![];
         App {
             blocks: vec![
                 Block::new(
-                    [32.0, 32.0],
+                    vec![32.0, 32.0],
                     GREEN,
                     3.0,
                     0.0,
+                    ShapeKind::Rect,
+                    &mut point_list,
+                ),
+                Block::new(
+                    vec![10.0, 14.0],
+                    RED,
+                    1.0, 1.0,
+                    ShapeKind::Ellipse,
+                    &mut point_list,
+                ),
+                Block::new(
+                    vec![30.0, 30.0, 35.0, 35.0, 1.0],
+                    RED,
+                    0.0,
+                    0.0,
+                    ShapeKind::Line,
+                    &mut point_list
+                ),
+                Block::new(
+                    vec![
+                        20.0, 10.0,
+                        25.0, 15.0,
+                        20.0, 15.0,
+                    ],
+                    GREEN,
+                    0.0,
+                    1.0,
+                    ShapeKind::Polygon,
+                    &mut point_list
                 )
-            ]
+            ],
+            point_list,
         }
     }
 }
 
 impl GameApp for App {
-
-    fn get_drawables(&self, args: &RenderArgs) -> Vec<(Vec<f64>, ShapeKind)> {
-        // what we want to draw?!
-        let mut points = Vec::new();
-        for block in &self.blocks {
-            points.push((block.get_shape_info(), block.get_shape_kind()));
-        }
-        points
+    fn get_drawables(&self, args: &RenderArgs) -> (&Vec<Block>, &Vec<Vec<f64>>) {
+        (&self.blocks, &self.point_list)
     }
 
     fn update(&mut self, args: &UpdateArgs) {
         for block in &mut self.blocks {
-            let p = block.get_shape_info();
-            let [dx, dy] = block.get_movement_rate();
-            block.set_shape_position(
-                p[0] + (dx * args.dt as f32) as f64,
-                p[1] + (dy * args.dt as f32) as f64
-            );
+            block.update_position(args, &mut self.point_list[block.index]);
         }
     }
 
@@ -84,8 +105,3 @@ impl GameApp for App {
     }
 }
 
-impl Commands for App {
-    fn run_command(cmd_str: &str) -> bool {
-        true
-    }
-}

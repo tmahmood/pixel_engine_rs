@@ -1,9 +1,9 @@
 use piston::input::{RenderArgs, UpdateArgs};
 use graphics::types::Rectangle;
-use crate::shapes::ShapeKind;
+use crate::game_engine::shapes::Block;
 
 pub trait GameApp {
-    fn get_drawables(&self, args: &RenderArgs) -> Vec<(Vec<f64>, ShapeKind)>;
+    fn get_drawables(&self, args: &RenderArgs) -> (&Vec<Block>, &Vec<Vec<f64>>);
     fn update(&mut self, args: &UpdateArgs);
     fn get_window_width(&self) -> i32;
     fn get_window_height(&self) -> i32;

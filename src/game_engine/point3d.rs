@@ -146,7 +146,7 @@ impl ops::DivAssign<f32> for Point3D {
 
 #[cfg(test)]
 mod tests {
-    use crate::point3d::Point3D;
+    use crate::game_engine::point3d::Point3D;
 
     #[test]
     fn test_cross() {
