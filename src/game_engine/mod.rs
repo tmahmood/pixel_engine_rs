@@ -60,8 +60,13 @@ impl GameEngine {
                                 rectangle(block.color, rect_base, t, gl);
                             }
                             ShapeKind::Ellipse => {
-                                let t = c.transform.trans(k[0] * block_width, k[1] * block_height);
-                                ellipse(block.color, rect_base, t, gl);
+                                let rect_ellipse =  [
+                                    k[0] * block_width,
+                                    k[1] * block_height,
+                                    k[2] * block_width,
+                                    k[3] * block_height,
+                                ];
+                                ellipse(block.color, rect_ellipse, c.transform, gl);
                             }
                             ShapeKind::Polygon => {
                                 let p:Vec<[f64;2]> = point_list[block.index]

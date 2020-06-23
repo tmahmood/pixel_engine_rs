@@ -32,26 +32,21 @@ impl App {
             blocks: vec![
                 Block::new(
                     vec![32.0, 32.0],
-                    GREEN,
-                    3.0,
-                    0.0,
+                    GREEN, 3.0, 0.0,
                     ShapeKind::Rect,
                     &mut point_list,
                 ),
                 Block::new(
-                    vec![10.0, 14.0],
-                    RED,
-                    1.0, 1.0,
+                    vec![10.0, 14.0, 4.0, 5.0],
+                    RED, 1.0, 1.0,
                     ShapeKind::Ellipse,
                     &mut point_list,
                 ),
                 Block::new(
-                    vec![30.0, 30.0, 35.0, 35.0, 1.0],
-                    RED,
-                    0.0,
-                    0.0,
+                    vec![30.0, 20.0, 32.0, 31.0, 1.0],
+                    RED, 0.0, -1.0,
                     ShapeKind::Line,
-                    &mut point_list
+                    &mut point_list,
                 ),
                 Block::new(
                     vec![
@@ -59,11 +54,9 @@ impl App {
                         25.0, 15.0,
                         20.0, 15.0,
                     ],
-                    GREEN,
-                    0.0,
-                    1.0,
+                    GREEN, 0.0, 1.0,
                     ShapeKind::Polygon,
-                    &mut point_list
+                    &mut point_list,
                 )
             ],
             point_list,

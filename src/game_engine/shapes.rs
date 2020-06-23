@@ -24,13 +24,7 @@ impl Block {
     pub fn new(points: Vec<f64>, color: [f32; 4], dx: f32, dy: f32, shape: ShapeKind, point_list: &mut Vec<Vec<f64>>) -> Self {
         let i = point_list.len();
         point_list.push(points);
-        Block {
-            color,
-            dx,
-            dy,
-            shape,
-            index: i,
-        }
+        Block { color, dx, dy, shape, index: i }
     }
 
     pub fn update_position(&mut self, args: &UpdateArgs, points: &mut Vec<f64>) {
@@ -38,19 +32,24 @@ impl Block {
             ShapeKind::Rect => {
                 points[0] = points[0] + (self.dx * args.dt as f32) as f64;
                 points[1] = points[1] + (self.dy * args.dt as f32) as f64;
-            },
+            }
             ShapeKind::Polygon => {
-                points.chunks_mut(2).for_each(|item|{
+                points.chunks_mut(2).for_each(|item| {
                     item[0] = item[0] + (self.dx * args.dt as f32) as f64;
                     item[1] = item[1] + (self.dy * args.dt as f32) as f64;
                 });
-            },
-            ShapeKind::Line => {},
-            ShapeKind::Pixel => {},
+            }
+            ShapeKind::Line => {
+                points[0] = points[0] + (self.dx * args.dt as f32) as f64;
+                points[1] = points[1] + (self.dy * args.dt as f32) as f64;
+                points[2] = points[2] + (self.dx * args.dt as f32) as f64;
+                points[3] = points[3] + (self.dy * args.dt as f32) as f64;
+            }
+            ShapeKind::Pixel => {}
             ShapeKind::Ellipse => {
                 points[0] = points[0] + (self.dx * args.dt as f32) as f64;
                 points[1] = points[1] + (self.dy * args.dt as f32) as f64;
-            },
+            }
         }
     }
 
