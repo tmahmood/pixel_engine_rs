@@ -1,17 +1,19 @@
 use piston::window::Position;
 use std::collections::HashMap;
 use piston::input::UpdateArgs;
+use crate::BLACK;
+use std::convert::TryInto;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
 pub enum ShapeKind {
     Rect,
     Polygon,
     Line,
-    Pixel,
     Ellipse,
+    None
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Block {
     pub color: [f32; 4],
     pub dx: f32,
@@ -20,13 +22,76 @@ pub struct Block {
     pub index: usize,
 }
 
-impl Block {
-    pub fn new(points: Vec<f64>, color: [f32; 4], dx: f32, dy: f32, shape: ShapeKind, point_list: &mut Vec<Vec<f64>>) -> Self {
-        let i = point_list.len();
-        point_list.push(points);
-        Block { color, dx, dy, shape, index: i }
+#[derive(Copy, Clone, Debug)]
+pub struct BlockBuilder {
+    block: Block,
+    index: Option<usize>,
+}
+
+impl BlockBuilder {
+    pub fn empty() -> Self {
+        BlockBuilder {
+            block: Block {
+                color: [0.0, 0.0, 0.0, 1.0],
+                dx: 0.0, dy: 0.0,
+                shape: ShapeKind::None, index: 0,
+            }, index: None
+        }
+    }
+    pub fn new(s: ShapeKind) -> Self {
+        BlockBuilder {
+            block: Block {
+                color: [1.0, 1.0, 1.0, 1.0],
+                dx: 0.0, dy: 0.0,
+                shape: s, index: 0,
+            }, index: None
+        }
     }
 
+    pub fn from_str(s: String) -> Self {
+        if s.starts_with("R") {
+            BlockBuilder::new(ShapeKind::Rect)
+        } else if s.starts_with("E") {
+            BlockBuilder::new(ShapeKind::Ellipse)
+        } else if s.starts_with("L") {
+            BlockBuilder::new(ShapeKind::Line)
+        } else if s.starts_with("P") {
+            BlockBuilder::new(ShapeKind::Polygon)
+        } else {
+            panic!("Invalid shapes")
+        }
+    }
+
+    pub fn color(&mut self, color: Vec<f32>) -> &mut Self {
+        self.block.color = [color[0], color[1], color[2], color[3]];
+        self
+    }
+
+    pub fn velocity(&mut self, dt: Vec<f32>) -> &mut Self {
+        self.block.dx = dt[0];
+        self.block.dy = dt[1];
+        self
+    }
+
+    pub fn points(&mut self, points: Vec<f64>, points_list: &mut Vec<Vec<f64>>) -> &mut Self {
+        self.index = Some(points_list.len());
+        points_list.push(points);
+        self
+    }
+
+    pub fn build(&mut self) -> Block {
+        if self.block.shape == ShapeKind::None {
+            panic!("Block is not initialized");
+        }
+        if self.index.is_none() {
+            panic!("Position information not initialized");
+        }
+        self.block.index = self.index.unwrap();
+        return self.block;
+    }
+}
+
+impl Block {
     pub fn update_position(&mut self, args: &UpdateArgs, points: &mut Vec<f64>) {
         match self.shape {
             ShapeKind::Rect => {
@@ -45,10 +110,12 @@ impl Block {
                 points[2] = points[2] + (self.dx * args.dt as f32) as f64;
                 points[3] = points[3] + (self.dy * args.dt as f32) as f64;
             }
-            ShapeKind::Pixel => {}
             ShapeKind::Ellipse => {
                 points[0] = points[0] + (self.dx * args.dt as f32) as f64;
                 points[1] = points[1] + (self.dy * args.dt as f32) as f64;
+            }
+            ShapeKind::None => {
+                panic!("This should not happen")
             }
         }
     }

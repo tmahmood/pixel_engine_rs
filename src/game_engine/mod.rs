@@ -3,19 +3,24 @@ pub mod game_app;
 pub mod shapes;
 pub mod commands;
 
-use piston_window::PistonWindow as Window;
+use piston_window::{PistonWindow as Window, TextureContext, PistonWindow, Texture, GfxFactory, G2dTexture, TextureSettings};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
 use graphics::math::Vec2d;
 use graphics::{math, clear, Context};
+
 use crate::{BLACK, GREEN, RED};
 
 use graphics::types::Rectangle;
 use graphics::rectangle::rectangle_by_corners;
 use crate::game_engine::shapes::ShapeKind;
 use crate::game_engine::game_app::GameApp;
+use gfx::{Resources, CommandBuffer};
+
+
+pub mod parse_block_list;
 
 pub struct GameEngine {
     pub size: [f64; 2],
@@ -32,14 +37,18 @@ impl GameEngine {
             .build()
             .unwrap();
         let gl = GlGraphics::new(opengl);
-        GameEngine { gl, size, window }
+        GameEngine {
+            gl,
+            size,
+            window,
+        }
     }
-
 
     pub fn game_loop<T: GameApp>(&mut self, app: &mut T) {
         use graphics::*;
         let mut events = Events::new(EventSettings::new());
         let rect_base = [0.0, 0.0, app.get_block_width(), app.get_block_height()];
+        // drawing context
         while let Some(e) = events.next(&mut self.window) {
             if let Some(args) = e.render_args() {
                 // get all the drawable
@@ -60,7 +69,7 @@ impl GameEngine {
                                 rectangle(block.color, rect_base, t, gl);
                             }
                             ShapeKind::Ellipse => {
-                                let rect_ellipse =  [
+                                let rect_ellipse = [
                                     k[0] * block_width,
                                     k[1] * block_height,
                                     k[2] * block_width,
@@ -69,7 +78,7 @@ impl GameEngine {
                                 ellipse(block.color, rect_ellipse, c.transform, gl);
                             }
                             ShapeKind::Polygon => {
-                                let p:Vec<[f64;2]> = point_list[block.index]
+                                let p: Vec<[f64; 2]> = point_list[block.index]
                                     .chunks(2)
                                     .map(|item|
                                         [item[0] * block_width, item[1] * block_height]
@@ -83,7 +92,9 @@ impl GameEngine {
                                     line_points[2] * block_width, line_points[3] * block_height
                                 ], c.transform, gl);
                             }
-                            ShapeKind::Pixel => {}
+                            ShapeKind::None => {
+                                panic!("This should not happen")
+                            }
                         };
                     }
                 });

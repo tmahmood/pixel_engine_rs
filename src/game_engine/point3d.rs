@@ -56,9 +56,7 @@ impl Point3D {
 impl ops::Neg for Point3D {
     type Output = Point3D;
     fn neg(self) -> Self::Output {
-        self.mul(-1.0)
-    }
-}
+        self.mul(-1.0) } }
 
 impl ops::Add<Point3D> for Point3D {
     type Output = Point3D;
@@ -166,7 +164,7 @@ mod tests {
 
     #[test]
     fn test_div() {
-        let mut v = Point3D { e: [6f32, 9f32, 12f32] };
+        let v = Point3D { e: [6f32, 9f32, 12f32] };
         let k = v / 3f32;
         assert_eq!(k.e, [2f32, 3f32, 4f32])
     }

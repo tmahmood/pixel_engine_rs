@@ -6,8 +6,11 @@ use piston::window::Position;
 use snake_game::{BLACK, GREEN, RED};
 use graphics::types::Rectangle;
 use std::collections::HashMap;
-use snake_game::game_engine::shapes::{Block, ShapeKind};
+use snake_game::game_engine::shapes::{Block, ShapeKind, BlockBuilder};
 use snake_game::game_engine::game_app::GameApp;
+use image::GenericImage;
+use snake_game::game_engine::parse_block_list::parse_block_list;
+use std::fs;
 
 
 // most of these configurations can be loaded from config file later
@@ -28,37 +31,10 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         let mut point_list = vec![];
+        let contents = fs::read_to_string("game_cfg")
+            .expect("Something went wrong reading the file");
         App {
-            blocks: vec![
-                Block::new(
-                    vec![32.0, 32.0],
-                    GREEN, 3.0, 0.0,
-                    ShapeKind::Rect,
-                    &mut point_list,
-                ),
-                Block::new(
-                    vec![10.0, 14.0, 4.0, 5.0],
-                    RED, 1.0, 1.0,
-                    ShapeKind::Ellipse,
-                    &mut point_list,
-                ),
-                Block::new(
-                    vec![30.0, 20.0, 32.0, 31.0, 1.0],
-                    RED, 0.0, -1.0,
-                    ShapeKind::Line,
-                    &mut point_list,
-                ),
-                Block::new(
-                    vec![
-                        20.0, 10.0,
-                        25.0, 15.0,
-                        20.0, 15.0,
-                    ],
-                    GREEN, 0.0, 1.0,
-                    ShapeKind::Polygon,
-                    &mut point_list,
-                )
-            ],
+            blocks: parse_block_list(contents, &mut point_list),
             point_list,
         }
     }

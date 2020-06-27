@@ -2,6 +2,7 @@ extern crate piston_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate gfx;
 
 pub const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 pub const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
