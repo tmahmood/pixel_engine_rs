@@ -10,7 +10,7 @@ pub fn parse_block_list(contents: String, point_list: &mut Vec<Vec<f64>>) -> Vec
             let f_values: Vec<String> = line.split("-").map(|s| s.trim().to_string()).collect();
             let s = f_values[1].to_owned();
             b = BlockBuilder::from_str(s);
-        } else if line == "" {
+        } else if line == "#" {
             let b_built = b.build();
             blocks.push(b_built);
             b = BlockBuilder::empty();
