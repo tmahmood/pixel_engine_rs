@@ -47,7 +47,6 @@ impl GameEngine {
     pub fn game_loop<T: GameApp>(&mut self, app: &mut T) {
         use graphics::*;
         let mut events = Events::new(EventSettings::new());
-        let rect_base = [0.0, 0.0, app.get_block_width(), app.get_block_height()];
         // drawing context
         while let Some(e) = events.next(&mut self.window) {
             if let Some(args) = e.render_args() {
@@ -65,8 +64,13 @@ impl GameEngine {
                         let k = &point_list[block.index];
                         match block.shape {
                             ShapeKind::Rect => {
-                                let t = c.transform.trans(k[0] * block_width, k[1] * block_height);
-                                rectangle(block.color, rect_base, t, gl);
+                                let rect= [
+                                    k[0] * block_width,
+                                    k[1] * block_height,
+                                    k[2] * block_width,
+                                    k[3] * block_height,
+                                ];
+                                rectangle(block.color, rect, c.transform, gl);
                             }
                             ShapeKind::Ellipse => {
                                 let rect_ellipse = [

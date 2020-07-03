@@ -32,13 +32,13 @@ pub fn parse_block_list(contents: String, point_list: &mut Vec<Vec<f64>>) -> Vec
 #[test]
 fn test_parse_block_list() {
     let content = "- Rect
-    P, 32.0, 32.0
+    P, 32.0, 32.0, 33.0, 33.0
     C, 0.0, 1.0, 1.0, 1.0
     V, 3.0, 0.0
-
+#
 ";
     let mut point_list: Vec<Vec<f64>> = Vec::new();
     let blocks = parse_block_list(format!("{}", content), &mut point_list);
     assert_eq!(blocks[0].shape, ShapeKind::Rect);
-    assert_eq!(point_list[0], vec![32.0, 32.0]);
+    assert_eq!(point_list[0], vec![32.0, 32.0, 33.0, 33.0]);
 }

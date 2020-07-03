@@ -1,4 +1,4 @@
-use snake_game::game_engine::point3d::Point3D;
+use gd_learn_001::game_engine::point3d::Point3D;
 
 pub struct Ray {
     origin: Point3D,

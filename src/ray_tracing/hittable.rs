@@ -1,5 +1,5 @@
-use snake_game::game_engine::point3d::{Point3D, dot};
 use crate::ray_tracing::ray::Ray;
+use gd_learn_001::game_engine::point3d::{Point3D, dot};
 
 pub struct HitRecord {
     pub p: Point3D,

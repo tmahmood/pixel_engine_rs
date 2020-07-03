@@ -3,13 +3,13 @@ use piston::input::{RenderArgs, UpdateArgs};
 use graphics::rectangle;
 use graphics::math::Vec2d;
 use piston::window::Position;
-use snake_game::{BLACK, GREEN, RED};
+use gd_learn_001::{BLACK, GREEN, RED};
 use graphics::types::Rectangle;
 use std::collections::HashMap;
-use snake_game::game_engine::shapes::{Block, ShapeKind, BlockBuilder};
-use snake_game::game_engine::game_app::GameApp;
+use gd_learn_001::game_engine::shapes::{Block, ShapeKind, BlockBuilder};
+use gd_learn_001::game_engine::game_app::GameApp;
 use image::GenericImage;
-use snake_game::game_engine::parse_block_list::parse_block_list;
+use gd_learn_001::game_engine::parse_block_list::parse_block_list;
 use std::fs;
 
 
@@ -23,24 +23,24 @@ pub const BLOCK_WIDTH: f64 = BOARD_WIDTH / MAP_SIZE as f64;
 pub const BLOCK_HEIGHT: f64 = BOARD_HEIGHT / MAP_SIZE as f64;
 
 
-pub struct App {
+pub struct BlockGame {
     pub blocks: Vec<Block>,
     pub point_list: Vec<Vec<f64>>,
 }
 
-impl App {
+impl BlockGame {
     pub fn new() -> Self {
         let mut point_list = vec![];
         let contents = fs::read_to_string("game_cfg")
             .expect("Something went wrong reading the file");
-        App {
+        BlockGame {
             blocks: parse_block_list(contents, &mut point_list),
             point_list,
         }
     }
 }
 
-impl GameApp for App {
+impl GameApp for BlockGame {
     fn get_drawables(&self, args: &RenderArgs) -> (&Vec<Block>, &Vec<Vec<f64>>) {
         (&self.blocks, &self.point_list)
     }

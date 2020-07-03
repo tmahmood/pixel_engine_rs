@@ -1,4 +1,4 @@
-use snake_game::game_engine::point3d::{Point3D, dot};
+use gd_learn_001::game_engine::point3d::{Point3D, dot};
 use crate::ray_tracing::ray::Ray;
 use piston_window::{TextureContext, G2dTexture, TextureSettings, Texture};
 
@@ -10,7 +10,7 @@ pub mod ray;
 pub mod hittable;
 
 pub mod sphere {
-    use snake_game::game_engine::point3d::{Point3D, dot};
+    use gd_learn_001::game_engine::point3d::{Point3D, dot};
     use crate::ray_tracing::hittable::{Hittable, HitRecord};
     use crate::ray_tracing::ray::Ray;
 

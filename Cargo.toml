@@ -1,5 +1,5 @@
 [package]
-name = "snake_game"
+name = "gd_learn_001"
 version = "0.1.0"
 authors = ["Tarin Mahmood <mahmood.tarin+home@gmail.com>"]
 edition = "2018"
