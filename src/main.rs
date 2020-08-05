@@ -5,21 +5,17 @@ extern crate image;
 pub mod ray_tracing;
 pub mod block_app;
 
-use gd_learn_001::{game_engine};
-use gd_learn_001::game_engine::{GameEngine};
-use opengl_graphics::{OpenGL};
 use crate::block_app::BlockGame;
-use piston_window::TextureContext;
+use ggez::{event, ContextBuilder};
+use ggez::graphics::Canvas;
 
 
 fn main() {
-    let opengl = OpenGL::V4_5;
-    let mut ge = GameEngine::new(
-        [
-            block_app::WINDOW_WIDTH as f64,
-            block_app::WINDOW_HEIGHT as f64
-        ], opengl,
-    );
-    let mut app: BlockGame = BlockGame::new();
-    ge.game_loop(&mut app);
+    let (mut context, mut events_loop) = ContextBuilder::new("my_game", "Cool Game Author")
+        .build()
+        .expect("aieee, could not create ggez context!");
+
+    let canvas = Canvas::with_window_size(&mut context);
+    let mut app: BlockGame = BlockGame::new(canvas.unwrap());
+    event::run(&mut context, &mut events_loop, &mut app);
 }

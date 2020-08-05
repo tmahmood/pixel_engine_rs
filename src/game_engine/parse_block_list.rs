@@ -2,7 +2,7 @@ use crate::game_engine::shapes::{Block, BlockBuilder, ShapeKind};
 use std::fs;
 use crate::RED;
 
-pub fn parse_block_list(contents: String, point_list: &mut Vec<Vec<f64>>) -> Vec<Block> {
+pub fn parse_block_list(contents: String, point_list: &mut Vec<Vec<f32>>) -> Vec<Block> {
     let mut blocks: Vec<Block> = Vec::new();
     let mut b: BlockBuilder = BlockBuilder::empty();
     contents.lines().for_each(|line| {
@@ -18,7 +18,7 @@ pub fn parse_block_list(contents: String, point_list: &mut Vec<Vec<f64>>) -> Vec
             let f_values: Vec<String> = line.split(",").map(|s| s.trim().to_string()).collect();
             let d_values = f_values.iter().skip(1);
             if f_values[0].trim() == "P".to_string() {
-                b.points(d_values.map(|v| v.parse::<f64>().unwrap()).collect(), point_list);
+                b.points(d_values.map(|v| v.parse::<f32>().unwrap()).collect(), point_list);
             } else if f_values[0].trim() == "C".to_string() {
                 b.color(d_values.map(|v| v.parse::<f32>().unwrap()).collect());
             } else if f_values[0].trim() == "V".to_string() {
@@ -37,7 +37,7 @@ fn test_parse_block_list() {
     V, 3.0, 0.0
 #
 ";
-    let mut point_list: Vec<Vec<f64>> = Vec::new();
+    let mut point_list: Vec<Vec<f32>> = Vec::new();
     let blocks = parse_block_list(format!("{}", content), &mut point_list);
     assert_eq!(blocks[0].shape, ShapeKind::Rect);
     assert_eq!(point_list[0], vec![32.0, 32.0, 33.0, 33.0]);

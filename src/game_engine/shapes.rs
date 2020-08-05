@@ -1,6 +1,4 @@
-use piston::window::Position;
 use std::collections::HashMap;
-use piston::input::UpdateArgs;
 use crate::BLACK;
 use std::convert::TryInto;
 
@@ -10,6 +8,7 @@ pub enum ShapeKind {
     Polygon,
     Line,
     Ellipse,
+    Circle,
     None
 }
 
@@ -57,6 +56,8 @@ impl BlockBuilder {
             BlockBuilder::new(ShapeKind::Line)
         } else if s.starts_with("P") {
             BlockBuilder::new(ShapeKind::Polygon)
+        } else if s.starts_with("C") {
+            BlockBuilder::new(ShapeKind::Circle)
         } else {
             panic!("Invalid shapes")
         }
@@ -73,7 +74,7 @@ impl BlockBuilder {
         self
     }
 
-    pub fn points(&mut self, points: Vec<f64>, points_list: &mut Vec<Vec<f64>>) -> &mut Self {
+    pub fn points(&mut self, points: Vec<f32>, points_list: &mut Vec<Vec<f32>>) -> &mut Self {
         self.index = Some(points_list.len());
         points_list.push(points);
         self
@@ -92,27 +93,33 @@ impl BlockBuilder {
 }
 
 impl Block {
-    pub fn update_position(&mut self, args: &UpdateArgs, points: &mut Vec<f64>) {
+
+    pub fn update_position(&mut self, args: std::time::Duration, points: &mut Vec<f32>) {
+        let dt = args.as_millis();
         match self.shape {
             ShapeKind::Rect => {
-                points[0] = points[0] + (self.dx * args.dt as f32) as f64;
-                points[1] = points[1] + (self.dy * args.dt as f32) as f64;
+                points[0] = points[0] + (self.dx * dt as f32) as f32;
+                points[1] = points[1] + (self.dy * dt as f32) as f32;
             }
             ShapeKind::Polygon => {
                 points.chunks_mut(2).for_each(|item| {
-                    item[0] = item[0] + (self.dx * args.dt as f32) as f64;
-                    item[1] = item[1] + (self.dy * args.dt as f32) as f64;
+                    item[0] = item[0] + (self.dx * dt as f32) as f32;
+                    item[1] = item[1] + (self.dy * dt as f32) as f32;
                 });
             }
             ShapeKind::Line => {
-                points[0] = points[0] + (self.dx * args.dt as f32) as f64;
-                points[1] = points[1] + (self.dy * args.dt as f32) as f64;
-                points[2] = points[2] + (self.dx * args.dt as f32) as f64;
-                points[3] = points[3] + (self.dy * args.dt as f32) as f64;
+                points[0] = points[0] + (self.dx * dt as f32) as f32;
+                points[1] = points[1] + (self.dy * dt as f32) as f32;
+                points[2] = points[2] + (self.dx * dt as f32) as f32;
+                points[3] = points[3] + (self.dy * dt as f32) as f32;
             }
             ShapeKind::Ellipse => {
-                points[0] = points[0] + (self.dx * args.dt as f32) as f64;
-                points[1] = points[1] + (self.dy * args.dt as f32) as f64;
+                points[0] = points[0] + (self.dx * dt as f32) as f32;
+                points[1] = points[1] + (self.dy * dt as f32) as f32;
+            }
+            ShapeKind::Circle => {
+                points[0] = points[0] + (self.dx * dt as f32) as f32;
+                points[1] = points[1] + (self.dy * dt as f32) as f32;
             }
             ShapeKind::None => {
                 panic!("This should not happen")
@@ -120,7 +127,7 @@ impl Block {
         }
     }
 
-    pub fn get_shape_info(&self, point_list: &Vec<Vec<f64>>) -> Vec<f64> {
+    pub fn get_shape_info(&self, point_list: &Vec<Vec<f32>>) -> Vec<f32> {
         point_list[self.index].to_vec()
     }
 

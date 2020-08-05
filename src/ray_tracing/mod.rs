@@ -1,6 +1,5 @@
 use gd_learn_001::game_engine::point3d::{Point3D, dot};
 use crate::ray_tracing::ray::Ray;
-use piston_window::{TextureContext, G2dTexture, TextureSettings, Texture};
 
 const ASPECT_RATIO: f32 = 16.0 / 9.0;
 const IMAGE_WIDTH: i32 = 384;
