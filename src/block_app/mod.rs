@@ -4,12 +4,12 @@ use gd_learn_001::game_engine::shapes::{Block, ShapeKind, BlockBuilder};
 use gd_learn_001::game_engine::game_app::GameApp;
 use gd_learn_001::game_engine::parse_block_list::parse_block_list;
 use std::fs;
-use ggez::{event, Context, GameResult, timer};
 use gd_learn_001::game_engine::game_board::{GameBoard, PixelMap, Pixel};
-use gd_learn_001::game_engine::{draw, blit_shapes};
-use ggez::graphics::Canvas;
+use gd_learn_001::game_engine::{blit_shapes};
 use rayon::iter::ParallelBridge;
 use rayon::prelude::ParallelIterator;
+use gd_learn_001::game_engine::game_events::GameEvents;
+use piston::{UpdateArgs, RenderArgs};
 
 
 // most of these configurations can be loaded from config file later
@@ -23,41 +23,22 @@ pub const BOARD_HEIGHT: f32 = 800.0;
 pub struct BlockGame {
     pub blocks: Vec<Block>,
     pub point_list: Vec<Vec<f32>>,
-    pub dt: std::time::Duration,
-    pub canvas: Canvas,
 }
 
 impl BlockGame {
-    pub fn new(canvas: Canvas) -> Self {
+    pub fn new() -> Self {
         let mut point_list = vec![];
         let contents = fs::read_to_string("game_cfg")
             .expect("Something went wrong reading the file");
         BlockGame {
             blocks: parse_block_list(contents, &mut point_list),
             point_list,
-            dt: std::time::Duration::new(0, 0),
-            canvas
         }
     }
 }
 
-impl event::EventHandler for BlockGame {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-        self.dt = timer::delta(_ctx);
-        let k = self.get_map_size() as f32;
-        for block in &mut self.blocks {
-            block.update_position(self.dt, &mut self.point_list[block.index]);
-            wrap_coordinates(
-                &mut self.point_list[block.index],
-                k,
-            );
-        }
-        Ok(())
-    }
-
-    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        let bw = self.get_block_width();
-        let bh = self.get_block_height();
+impl GameEvents for BlockGame {
+    fn render(&mut self, args: &RenderArgs) -> PixelMap {
         let map_size = self.get_map_size();
         self.point_list.iter_mut().par_bridge().for_each(|point|{
             wrap_coordinates(point, map_size as f32);
@@ -75,8 +56,18 @@ impl event::EventHandler for BlockGame {
             value.point.x = ox;
             value.point.y = oy;
         });
-        draw(ctx, &pixels, bw, bh, &mut self.canvas);
-        Ok(())
+        pixels
+    }
+
+    fn update(&mut self, args: &UpdateArgs) {
+        let k = self.get_map_size() as f32;
+        for block in &mut self.blocks {
+            block.update_position(args.dt, &mut self.point_list[block.index]);
+            wrap_coordinates(
+                &mut self.point_list[block.index],
+                k,
+            );
+        }
     }
 }
 
@@ -126,4 +117,3 @@ pub fn wrap_coordinates(points: &mut Vec<f32>, map_size: f32) {
         points[point + 1] = oy;
     }
 }
-

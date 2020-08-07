@@ -1,9 +1,8 @@
-use ggez::nalgebra::Point2;
-use ggez::graphics::{Color, Rect, DrawMode, Mesh};
 use std::collections::HashMap;
-use ggez::{Context, graphics, GameResult, GameError};
 use crate::game_engine::shapes::Block;
 use std::mem::swap;
+use mint::Point2;
+use graphics::types::Color;
 
 pub type PixelMap = HashMap<String, Pixel>;
 
@@ -28,14 +27,10 @@ impl GameBoard {
         }
     }
 }
-pub fn set_pixel_range(pixels: &mut PixelMap, x: f32, y: f32, how_many: i32, color: Color) {
-
-
-}
 
 pub fn set_pixel(pixels: &mut PixelMap, x: f32, y: f32, color: Color) {
     pixels.insert(make_key(x, y), Pixel {
-        point: Point2::new(x, y),
+        point: Point2{x, y},
         color,
     });
 }

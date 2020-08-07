@@ -94,8 +94,7 @@ impl BlockBuilder {
 
 impl Block {
 
-    pub fn update_position(&mut self, args: std::time::Duration, points: &mut Vec<f32>) {
-        let dt = args.as_millis();
+    pub fn update_position(&mut self, dt: f64, points: &mut Vec<f32>) {
         match self.shape {
             ShapeKind::Rect => {
                 points[0] = points[0] + (self.dx * dt as f32) as f32;
