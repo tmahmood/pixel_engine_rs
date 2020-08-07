@@ -1,12 +1,12 @@
 pub mod point3d;
-pub mod game_app;
+pub mod game_data_model;
 pub mod shapes;
 pub mod commands;
 
 use crate::{BLACK, GREEN, RED};
 use crate::game_engine::shapes::{ShapeKind, Block};
-use crate::game_engine::game_app::GameApp;
-use crate::game_engine::game_board::{GameBoard, Pixel, PixelMap, draw_ellipse, draw_circle};
+use crate::game_engine::game_data_model::GameDataModel;
+use crate::game_engine::game_board::{GameBoard, Pixel, PixelMap};
 use std::collections::HashMap;
 use rayon::iter::{IntoParallelRefIterator, ParallelBridge, ParallelIterator};
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -53,13 +53,13 @@ pub fn blit_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
                 );
             }
             ShapeKind::Circle => {
-                draw_circle(
+                game_board::draw_circle(
                     k[0], k[1], k[2], &mut pixels,
                     Color::from(block.color),
                 );
             }
             ShapeKind::Ellipse => {
-                draw_ellipse(
+                game_board::draw_ellipse(
                     k[0], k[1], k[2], k[3], &mut pixels,
                     Color::from(block.color),
                 );
@@ -103,7 +103,7 @@ pub fn blit_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
 }
 
 
-pub fn game_loop<T: GameApp + GameEvents>(mut app: T, mut game_data: GameEngineData) {
+pub fn game_loop<T: GameDataModel + GameEvents>(mut app: T, mut game_data: GameEngineData) {
     use graphics::*;
     let mut events = Events::new(EventSettings::new());
     // drawing context

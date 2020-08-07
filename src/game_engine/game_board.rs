@@ -1,3 +1,9 @@
+/// # Game Board
+/// game board handles the game without depending on any game library.
+/// This allows to implement our game using any game engine/backend we want.
+/// We are only modifying the game array here.
+
+
 use std::collections::HashMap;
 use crate::game_engine::shapes::Block;
 use std::mem::swap;
@@ -30,7 +36,7 @@ impl GameBoard {
 
 pub fn set_pixel(pixels: &mut PixelMap, x: f32, y: f32, color: Color) {
     pixels.insert(make_key(x, y), Pixel {
-        point: Point2{x, y},
+        point: Point2 { x, y },
         color,
     });
 }
@@ -151,23 +157,28 @@ fn rol() -> u32 {
     return pattern & 1;
 }
 
-fn draw_straight_line(p_fix: f32, _p1: f32, _p2: f32, points: &mut PixelMap, color: Color, if_vertical: bool) {
+fn draw_straight_line(fixed_axis: f32, _p1: f32, _p2: f32, points: &mut PixelMap, color: Color, if_vertical: bool) {
     let mut p1 = _p1;
     let mut p2 = _p2;
     if _p2 < _p1 {
         p1 = _p2;
         p2 = _p1;
     }
-    let mut y = p1;
-    while y <= p2 {
-        if rol() >= 1 {
-            if if_vertical {
-                set_pixel(points, p_fix, y, color);
-            } else {
-                set_pixel(points, y, p_fix, color);
+    let mut change_axis = p1;
+    if if_vertical {
+        while change_axis <= p2 {
+            if rol() >= 1 {
+                set_pixel(points, fixed_axis, change_axis, color);
             }
+            change_axis = change_axis + 1.0;
         }
-        y = y + 1.0;
+    } else {
+        while change_axis <= p2 {
+            if rol() >= 1 {
+                set_pixel(points, change_axis, fixed_axis, color);
+            }
+            change_axis = change_axis + 1.0;
+        }
     }
     return;
 }

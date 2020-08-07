@@ -1,7 +1,7 @@
 use crate::game_engine::shapes::Block;
 use crate::game_engine::game_board::PixelMap;
 
-pub trait GameApp {
+pub trait GameDataModel {
     fn get_drawables(&self) -> (&Vec<Block>, &Vec<Vec<f32>>);
     fn get_window_width(&self) -> i32;
     fn get_window_height(&self) -> i32;

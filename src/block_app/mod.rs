@@ -1,7 +1,7 @@
 use gd_learn_001::{BLACK, GREEN, RED};
 use std::collections::HashMap;
 use gd_learn_001::game_engine::shapes::{Block, ShapeKind, BlockBuilder};
-use gd_learn_001::game_engine::game_app::GameApp;
+use gd_learn_001::game_engine::game_data_model::GameDataModel;
 use gd_learn_001::game_engine::parse_block_list::parse_block_list;
 use std::fs;
 use gd_learn_001::game_engine::game_board::{GameBoard, PixelMap, Pixel};
@@ -38,11 +38,9 @@ impl BlockGame {
 }
 
 impl GameEvents for BlockGame {
+    // do render things
     fn render(&mut self, args: &RenderArgs) -> PixelMap {
         let map_size = self.get_map_size();
-        self.point_list.iter_mut().par_bridge().for_each(|point|{
-            wrap_coordinates(point, map_size as f32);
-        });
         let mut b = Vec::new();
         let mut p = Vec::new();
         {
@@ -63,15 +61,11 @@ impl GameEvents for BlockGame {
         let k = self.get_map_size() as f32;
         for block in &mut self.blocks {
             block.update_position(args.dt, &mut self.point_list[block.index]);
-            wrap_coordinates(
-                &mut self.point_list[block.index],
-                k,
-            );
         }
     }
 }
 
-impl GameApp for BlockGame {
+impl GameDataModel for BlockGame {
     fn get_drawables(&self) -> (&Vec<Block>, &Vec<Vec<f32>>) {
         (&self.blocks, &self.point_list)
     }
