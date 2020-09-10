@@ -21,8 +21,6 @@ pub fn parse_block_list(contents: String, point_list: &mut Vec<Vec<f32>>) -> Vec
                 b.points(d_values.map(|v| v.parse::<f32>().unwrap()).collect(), point_list);
             } else if f_values[0].trim() == "C".to_string() {
                 b.color(d_values.map(|v| v.parse::<f32>().unwrap()).collect());
-            } else if f_values[0].trim() == "V".to_string() {
-                b.velocity(d_values.map(|v| v.parse::<f32>().unwrap()).collect());
             }
         }
     });
@@ -34,7 +32,6 @@ fn test_parse_block_list() {
     let content = "- Rect
     P, 32.0, 32.0, 33.0, 33.0
     C, 0.0, 1.0, 1.0, 1.0
-    V, 3.0, 0.0
 #
 ";
     let mut point_list: Vec<Vec<f32>> = Vec::new();

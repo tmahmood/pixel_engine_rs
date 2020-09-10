@@ -1,3 +1,4 @@
+#![feature(vec_remove_item)]
 extern crate gd_learn_001;
 extern crate uuid;
 extern crate image;

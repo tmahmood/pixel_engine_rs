@@ -11,10 +11,10 @@ use std::collections::HashMap;
 use rayon::iter::{IntoParallelRefIterator, ParallelBridge, ParallelIterator};
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston_window::{PistonWindow as Window, WindowSettings};
-use piston::{RenderArgs, Events, EventSettings, RenderEvent, UpdateEvent};
+use piston::{RenderArgs, Events, EventSettings, RenderEvent, UpdateEvent, PressEvent, ReleaseEvent, ResizeEvent, Button, Key};
 use graphics::{clear, rectangle};
 use graphics::types::Color;
-use crate::game_engine::game_events::GameEvents;
+use crate::game_engine::game_events::PistonGameEvents;
 
 
 pub mod parse_block_list;
@@ -39,7 +39,7 @@ pub fn init_game_engine(size: [f64; 2], opengl: OpenGL) -> GameEngineData {
     }
 }
 
-pub fn blit_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap {
+pub fn draw_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap {
     let mut pixels: PixelMap = HashMap::new();
     // draw things, we check what kind of shape we are working with
     // and draw appropriate shape
@@ -65,28 +65,11 @@ pub fn blit_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
                 );
             }
             ShapeKind::Polygon => {
-                let mut p: Vec<f32> = Vec::new();
-                let mut n = 0;
-                point_list[block.index]
-                    .chunks(2)
-                    .for_each(|item| {
-                        p.extend(item);
-                        if p.len() == 4 {
-                            game_board::draw_line(
-                                p[0], p[1], p[2], p[3], &mut pixels,
-                                Color::from(block.color),
-                            );
-                            p = vec![p[2], p[3]];
-                            n += 1;
-                        }
-                    });
-                game_board::draw_line(
-                    point_list[block.index][0],
-                    point_list[block.index][1],
-                    p[0], p[1],
-                    &mut pixels,
-                    Color::from(block.color),
-                );
+                game_board::draw_polygon(
+                    &point_list,
+                    &block,
+                    &mut pixels
+                )
             }
             ShapeKind::Line => {
                 game_board::draw_line(
@@ -102,8 +85,7 @@ pub fn blit_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
     pixels
 }
 
-
-pub fn game_loop<T: GameDataModel + GameEvents>(mut app: T, mut game_data: GameEngineData) {
+pub fn game_loop<T: GameDataModel + PistonGameEvents>(mut app: T, mut game_data: GameEngineData) {
     use graphics::*;
     let mut events = Events::new(EventSettings::new());
     // drawing context
@@ -129,6 +111,12 @@ pub fn game_loop<T: GameDataModel + GameEvents>(mut app: T, mut game_data: GameE
                     rectangle(pixel.color, base_rect, transform, gl);
                 });
             });
+        }
+        if let Some(button) = e.press_args() {
+            app.handle_press_events(&button);
+        }
+        if let Some(button) = e.release_args() {
+            app.handle_release_events(&button);
         }
         if let Some(args) = e.update_args() {
             app.update(&args);

@@ -15,8 +15,6 @@ pub enum ShapeKind {
 #[derive(Copy, Clone, Debug)]
 pub struct Block {
     pub color: [f32; 4],
-    pub dx: f32,
-    pub dy: f32,
     pub shape: ShapeKind,
     pub index: usize,
 }
@@ -32,19 +30,38 @@ impl BlockBuilder {
         BlockBuilder {
             block: Block {
                 color: [0.0, 0.0, 0.0, 1.0],
-                dx: 0.0, dy: 0.0,
                 shape: ShapeKind::None, index: 0,
             }, index: None
         }
     }
+
     pub fn new(s: ShapeKind) -> Self {
         BlockBuilder {
             block: Block {
                 color: [1.0, 1.0, 1.0, 1.0],
-                dx: 0.0, dy: 0.0,
                 shape: s, index: 0,
             }, index: None
         }
+    }
+
+    pub fn line() -> Self {
+        BlockBuilder::new(ShapeKind::Line)
+    }
+
+    pub fn circle() -> Self {
+        BlockBuilder::new(ShapeKind::Circle)
+    }
+
+    pub fn rect() -> Self {
+        BlockBuilder::new(ShapeKind::Rect)
+    }
+
+    pub fn ellipse() -> Self {
+        BlockBuilder::new(ShapeKind::Ellipse)
+    }
+
+    pub fn polygon() -> Self {
+        BlockBuilder::new(ShapeKind::Polygon)
     }
 
     pub fn from_str(s: String) -> Self {
@@ -68,12 +85,6 @@ impl BlockBuilder {
         self
     }
 
-    pub fn velocity(&mut self, dt: Vec<f32>) -> &mut Self {
-        self.block.dx = dt[0];
-        self.block.dy = dt[1];
-        self
-    }
-
     pub fn points(&mut self, points: Vec<f32>, points_list: &mut Vec<Vec<f32>>) -> &mut Self {
         self.index = Some(points_list.len());
         points_list.push(points);
@@ -94,38 +105,6 @@ impl BlockBuilder {
 
 impl Block {
 
-    pub fn update_position(&mut self, dt: f64, points: &mut Vec<f32>) {
-        match self.shape {
-            ShapeKind::Rect => {
-                points[0] = points[0] + (self.dx * dt as f32) as f32;
-                points[1] = points[1] + (self.dy * dt as f32) as f32;
-            }
-            ShapeKind::Polygon => {
-                points.chunks_mut(2).for_each(|item| {
-                    item[0] = item[0] + (self.dx * dt as f32) as f32;
-                    item[1] = item[1] + (self.dy * dt as f32) as f32;
-                });
-            }
-            ShapeKind::Line => {
-                points[0] = points[0] + (self.dx * dt as f32) as f32;
-                points[1] = points[1] + (self.dy * dt as f32) as f32;
-                points[2] = points[2] + (self.dx * dt as f32) as f32;
-                points[3] = points[3] + (self.dy * dt as f32) as f32;
-            }
-            ShapeKind::Ellipse => {
-                points[0] = points[0] + (self.dx * dt as f32) as f32;
-                points[1] = points[1] + (self.dy * dt as f32) as f32;
-            }
-            ShapeKind::Circle => {
-                points[0] = points[0] + (self.dx * dt as f32) as f32;
-                points[1] = points[1] + (self.dy * dt as f32) as f32;
-            }
-            ShapeKind::None => {
-                panic!("This should not happen")
-            }
-        }
-    }
-
     pub fn get_shape_info(&self, point_list: &Vec<Vec<f32>>) -> Vec<f32> {
         point_list[self.index].to_vec()
     }
@@ -138,8 +117,112 @@ impl Block {
         self.index
     }
 
-    pub fn get_movement_rate(&self) -> [f32; 2] {
-        [self.dx, self.dy]
+}
+
+pub struct LineBuilder {
+    points: [f32; 4]
+}
+
+impl LineBuilder {
+    pub fn start_point(x: f32, y:f32) -> Self {
+        LineBuilder {
+            points: [x, y, 0.0, 0.0]
+        }
+    }
+
+    pub fn to(&mut self, px: f32, py: f32) -> &mut Self {
+        self.points[2] = self.points[0] + px;
+        self.points[3] = self.points[1] + py;
+        self
+    }
+
+    pub fn end_point(&mut self, x: f32, y: f32) -> &mut Self {
+        self.points[2] = x;
+        self.points[3] = y;
+        self
+    }
+    pub fn build(&mut self) -> Vec<f32> {
+        Vec::from(self.points)
+    }
+}
+pub struct RectBuilder {
+    points: [f32; 4]
+}
+
+impl RectBuilder {
+    pub fn position(x: f32, y:f32) -> Self {
+        RectBuilder {
+            points: [x, y, 0.0, 0.0]
+        }
+    }
+
+    pub fn size(&mut self, w: f32, h: f32) -> &mut Self {
+        self.points[2] = w;
+        self.points[3] = h;
+        self
+    }
+
+    pub fn build(&mut self) -> Vec<f32> {
+        Vec::from(self.points)
+    }
+}
+
+pub struct EllipseBuilder {
+    points: [f32; 4]
+}
+
+impl EllipseBuilder {
+
+    pub fn position(x: f32, y: f32) -> Self {
+        EllipseBuilder  {
+            points: [x, y, 0.0, 0.0]
+        }
+    }
+
+    pub fn rad(&mut self, a: f32, b: f32) -> &mut Self {
+        self.points[2] = a;
+        self.points[3] = b;
+        self
+    }
+
+    pub fn build(&mut self) -> Vec<f32> {
+        Vec::from(self.points)
+    }
+}
+
+pub struct CircleBuilder {
+    points: [f32; 3]
+}
+
+impl CircleBuilder {
+    pub fn new(x: f32, y: f32, r: f32) -> Self {
+        CircleBuilder {
+            points: [x, y, r]
+        }
+    }
+
+    pub fn build(&self) -> Vec<f32> {
+        Vec::from(self.points)
+    }
+}
+
+pub struct PolygonBuilder {
+    points: Vec<f32>,
+}
+
+impl PolygonBuilder {
+    pub fn start_point(x: f32, y: f32) -> Self {
+        PolygonBuilder { points: vec![x, y] }
+    }
+
+    pub fn add_point(&mut self, x: f32, y: f32) -> &mut Self {
+        self.points.extend_from_slice(&[x, y]);
+        self
+    }
+
+    pub fn build(&mut self) -> Vec<f32> {
+        self.points.extend_from_slice(&[self.points[0], self.points[1]]);
+        self.points.clone()
     }
 }
 

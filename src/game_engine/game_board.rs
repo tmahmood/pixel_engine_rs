@@ -113,48 +113,83 @@ pub fn draw_ellipse(cx: f32, cy: f32, a: f32, b: f32, points: &mut PixelMap, col
     }
 }
 
-/// drawing line using (Bresenham's_line_algorithm)[https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm]
-/// will draw straight lines without using the algorithm if x1/x2 or y1,y2 are in same line
 pub fn draw_line(_x1: f32, _y1: f32, _x2: f32, _y2: f32, points: &mut PixelMap, color: Color) {
     let mut x1 = _x1;
     let mut x2 = _x2;
     let mut y1 = _y1;
     let mut y2 = _y2;
-    let dx = (x2 - x1).abs();
-    let dy = -(y2 - y1).abs();
+    // difference between points
+    let dx = (x2 - x1);
+    let dy = (y2 - y1);
+    // if any of dx/dy is zero ... it's a straight line along axis
     if dx == 0.0 {
         return draw_straight_line(x1, y1, y2, points, color, true);
     }
     if dy == 0.0 {
         return draw_straight_line(y1, x1, x2, points, color, false);
     }
-    // which way we are moving?
-    let sx = if x1 < x2 { 1.0 } else { -1.0 };
-    let sy = if y1 < y2 { 1.0 } else { -1.0 };
-    // err values that needs correcting
-    let mut err = dx + dy;  /* error value e_xy */
-    let mut e2 = 0.0;
-    loop {
-        set_pixel(points, x1, y1, color);
-        // we have reached our target point
-        if x1 >= x2 && y1 >= y2 { break; }
-        //
-        e2 = 2.0 * err;
-        if e2 >= dy {
-            err += dy;
-            x1 += sx;
+    // lets start drawing
+    let mut x = x1;
+    let mut y = y1;
+    let dx1 = dx.abs();
+    let dy1 = dy.abs();
+    let mut px = 2.0 * dy1 - dx1;
+    let mut py = 2.0 * dx1 - dy1;
+    let mut xe;
+    let mut ye;
+    //
+    if dy1 <= dx1 {
+        // find the starting point.
+        if dx >= 0.0 {
+            x = x1;
+            y = y1;
+            xe = x2;
+        } else {
+            x = x2;
+            y = y2;
+            xe = x1;
         }
-        if e2 <= dx {
-            err += dx;
-            y1 += sy;
+        set_pixel(points, x, y, color);
+        while x < xe {
+            x = x + 1.0;
+            if px < 0.0 {
+                px = px + 2.0 * dy1;
+            } else {
+                if (dx < 0.0 && dy < 0.0) || (dx > 0.0 && dy > 0.0) {
+                    y = y + 1.0
+                } else {
+                    y = y - 1.0
+                }
+                px = px + 2.0 * (dy1 - dx1);
+            }
+            set_pixel(points, x, y, color);
+        }
+    } else {
+        if dy >= 0.0 {
+            x = x1;
+            y = y1;
+            ye = y2;
+        } else {
+            x = x2;
+            y = y2;
+            ye = y1;
+        }
+        set_pixel(points, x, y, color);
+        while y < ye {
+            y = y + 1.0;
+            if py <= 0.0 {
+                py = py + 2.0 * dx1;
+            } else {
+                if (dx < 0.0 && dy < 0.0) || (dx > 0.0 && dy > 0.0) {
+                    x = x + 1.0
+                } else {
+                    x = x - 1.0;
+                }
+                py = py + 2.0 * (dx1 - dy1);
+            }
+            set_pixel(points, x, y, color);
         }
     }
-}
-
-fn rol() -> u32 {
-    let mut pattern: u32 = 0xFFFFFFFF;
-    pattern = (pattern << 1) | (pattern >> 31);
-    return pattern & 1;
 }
 
 fn draw_straight_line(fixed_axis: f32, _p1: f32, _p2: f32, points: &mut PixelMap, color: Color, if_vertical: bool) {
@@ -167,20 +202,39 @@ fn draw_straight_line(fixed_axis: f32, _p1: f32, _p2: f32, points: &mut PixelMap
     let mut change_axis = p1;
     if if_vertical {
         while change_axis <= p2 {
-            if rol() >= 1 {
-                set_pixel(points, fixed_axis, change_axis, color);
-            }
+            set_pixel(points, fixed_axis, change_axis, color);
             change_axis = change_axis + 1.0;
         }
     } else {
         while change_axis <= p2 {
-            if rol() >= 1 {
-                set_pixel(points, change_axis, fixed_axis, color);
-            }
+            set_pixel(points, change_axis, fixed_axis, color);
             change_axis = change_axis + 1.0;
         }
     }
     return;
+}
+
+pub fn draw_polygon(point_list: &Vec<Vec<f32>>, block: &Block, pixels: &mut PixelMap) {
+    let mut p: Vec<f32> = Vec::new();
+    println!("{:?}", point_list);
+    point_list[block.index]
+        // make pairs
+        .chunks(2)
+        // parse through the pairs
+        .for_each(|item| {
+            // add to point list
+            p.extend(item);
+            // we have 2 points, so draw the line
+            if p.len() == 4 {
+                draw_line(
+                    p[0], p[1], p[2], p[3], pixels,
+                    Color::from(block.color),
+                );
+                // only keep last two points
+                p = vec![p[2], p[3]];
+            }
+        });
+    println!("{:?}", p);
 }
 
 pub fn draw_circle(x: f32, y: f32, r: f32, points: &mut PixelMap, color: Color) {
