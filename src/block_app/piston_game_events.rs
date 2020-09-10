@@ -47,7 +47,7 @@ impl PistonGameEvents for BlockGame {
             update_position(
                 obj.block.shape, args.dt,
                 &mut self.point_list[obj.block.index],
-                obj.dx, obj.dy, dw, dh
+                obj.dx, obj.dy, dw, dh,
             );
         }
     }
@@ -56,8 +56,8 @@ impl PistonGameEvents for BlockGame {
         match button {
             Button::Keyboard(k) => {
                 self.key_pressed.push(k.clone());
-            },
-            (_) => {},
+            }
+            (_) => {}
         }
     }
 

@@ -39,60 +39,28 @@ impl BlockGame {
         let mut point_list = vec![];
         BlockGame {
             blocks: vec![
-                // MovingObjects {
-                //     dx: 8.0,
-                //     dy: 8.0,
-                //     angle: 0.0,
-                //     max_speed: 5.0,
-                //     block: BlockBuilder::rect()
-                //         .points(RectBuilder::position(23.0, 15.0)
-                //                     .size(20.0, 20.0).build(), &mut point_list)
-                //         .color(Vec::from(RED))
-                //         .build(),
-                // },
-                // MovingObjects {
-                //     dx: 9.0,
-                //     dy: 3.0,
-                //     angle: 0.0,
-                //     max_speed: 5.0,
-                //     block: BlockBuilder::ellipse()
-                //         .points(EllipseBuilder::position(23.0, 15.0).rad(10.0, 10.0).build(),
-                //                 &mut point_list)
-                //         .color(Vec::from(RED))
-                //         .build(),
-                // },
-                // MovingObjects {
-                //     dx: 40.0,
-                //     dy: 10.0,
-                //     angle: 0.0,
-                //     max_speed: 9.0,
-                //     block: BlockBuilder::circle()
-                //         .color(vec![43.0, 87.0, 23.0, 100.0])
-                //         .points(CircleBuilder::new(56.0, 70.0, 10.0).build(), &mut point_list)
-                //         .build(),
-                // },
-                // MovingObjects {
-                //     dx: 15.0,
-                //     dy: 10.0,
-                //     angle: 0.0,
-                //     max_speed: 0.0,
-                //     block: BlockBuilder::polygon()
-                //         .color(vec![43.0, 87.0, 23.0, 100.0])
-                //         .points(
-                //             PolygonBuilder::start_point(10.0, 10.0)
-                //                 .add_point(15.0, 15.0)
-                //                 .add_point(25.0, 25.0)
-                //                 .build(), &mut point_list
-                //         )
-                //         .build(),
-                // },
                 MovingObjects {
-                    dx: 10.0,
-                    dy: 3.0,
+                    dx: 0.0,
+                    dy: 0.0,
                     angle: 0.0,
-                    max_speed: 6.0,
+                    max_speed: 20.0,
+                    block: BlockBuilder::polygon()
+                        .color(vec![43.0, 87.0, 23.0, 100.0])
+                        .points(
+                            PolygonBuilder::start_point(10.0, 10.0)
+                                .add_point(55.0, 15.0)
+                                .add_point(15.0, 25.0)
+                                .build(), &mut point_list
+                        )
+                        .build(),
+                },
+                MovingObjects {
+                    dx: 0.0,
+                    dy: 0.0,
+                    angle: 0.0,
+                    max_speed: 30.0,
                     block: BlockBuilder::line()
-                        .points(LineBuilder::start_point(40.0, 40.0).end_point(55.0, 58.0).build(),
+                        .points(LineBuilder::start_point(40.0, 60.0).end_point(55.0, 65.0).build(),
                                 &mut point_list)
                         .color(Vec::from(GREEN))
                         .build(),
@@ -149,47 +117,71 @@ pub struct MovingObjects {
     pub block: Block,
 }
 
+fn check_boundaries(points: &mut Vec<f32>, bw: f32, bh: f32) {
+    if points[0] >= bw { points[0] = 0.0 }
+    else if points[0] < 0.0 { points[0] = bw}
+    if points[1] >= bh { points[1] = 0.0 }
+    else if points[1] < 0.0 { points[1] = bh}
+}
+
+fn check_line_boundaries(points: &mut Vec<f32>, bw: f32, bh: f32) {
+    if points[0] >= bw {
+        points[2] = (points[2] - points[0]).abs();
+        points[0] = 0.0;
+    } else if points[2] < 0.0 {
+        points[0] = bw - (points[2] - points[0]).abs();
+        points[2] = bw;
+    }
+    if points[1] >= bh {
+        points[3] = (points[3] - points[1]).abs();
+        points[1] = 0.0;
+    } else if points[3] < 0.0 {
+        points[1] = bh - (points[3] - points[1]).abs();
+        points[3] = bh;
+    }
+}
+
 pub fn update_position(shape: ShapeKind, dt: f64, points: &mut Vec<f32>, dx: f32, dy: f32, bw: f32, bh: f32) {
     match shape {
         ShapeKind::Rect => {
             points[0] = points[0] + (dx * dt as f32) as f32;
             points[1] = points[1] + (dy * dt as f32) as f32;
-            if points[0] >= bw { points[0] = 0.0 }
-            if points[1] >= bh { points[1] = 0.0 }
+            check_boundaries(points, bw, bh);
         }
         ShapeKind::Polygon => {
             points.chunks_mut(2).for_each(|item| {
                 item[0] = item[0] + (dx * dt as f32) as f32;
                 item[1] = item[1] + (dy * dt as f32) as f32;
-                if item[0] >= bw { item[0] = 0.0 }
-                if item[1] >= bh { item[1] = 0.0 }
             });
+            let mut p: Vec<f32> = Vec::new();
+            // polygons are collection of lines, so we just check
+            // if all the lines are in proper position
+            points
+                .chunks(2)
+                .for_each(|item| {
+                    p.extend(item);
+                    if p.len() == 4 {
+                        check_line_boundaries(&mut p, bw, bh);
+                        p = vec![p[2], p[3]];
+                    }
+                });
         }
         ShapeKind::Line => {
             points[0] = points[0] + (dx * dt as f32) as f32;
             points[1] = points[1] + (dy * dt as f32) as f32;
             points[2] = points[2] + (dx * dt as f32) as f32;
             points[3] = points[3] + (dy * dt as f32) as f32;
-            if points[0] >= bw {
-                points[2] = (points[2] - points[0]).abs();
-                points[0] = 0.0;
-            }
-            if points[1] >= bw {
-                points[3] = (points[3] - points[1]).abs();
-                points[1] = 0.0;
-            }
+            check_line_boundaries(points, bw, bh);
         }
         ShapeKind::Ellipse => {
             points[0] = points[0] + (dx * dt as f32) as f32;
             points[1] = points[1] + (dy * dt as f32) as f32;
-            if points[0] >= bw { points[0] = 0.0 }
-            if points[1] >= bh { points[1] = 0.0 }
+            check_boundaries(points, bw, bh);
         }
         ShapeKind::Circle => {
             points[0] = points[0] + (dx * dt as f32) as f32;
             points[1] = points[1] + (dy * dt as f32) as f32;
-            if points[0] >= bw { points[0] = 0.0 }
-            if points[1] >= bh { points[1] = 0.0 }
+            check_boundaries(points, bw, bh);
         }
         ShapeKind::None => {
             panic!("This should not happen")

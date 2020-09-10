@@ -216,7 +216,6 @@ fn draw_straight_line(fixed_axis: f32, _p1: f32, _p2: f32, points: &mut PixelMap
 
 pub fn draw_polygon(point_list: &Vec<Vec<f32>>, block: &Block, pixels: &mut PixelMap) {
     let mut p: Vec<f32> = Vec::new();
-    println!("{:?}", point_list);
     point_list[block.index]
         // make pairs
         .chunks(2)
@@ -234,7 +233,6 @@ pub fn draw_polygon(point_list: &Vec<Vec<f32>>, block: &Block, pixels: &mut Pixe
                 p = vec![p[2], p[3]];
             }
         });
-    println!("{:?}", p);
 }
 
 pub fn draw_circle(x: f32, y: f32, r: f32, points: &mut PixelMap, color: Color) {
