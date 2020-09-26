@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/gd_learn_001.iml" filepath="$PROJECT_DIR$/gd_learn_001.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pixel_game_engine.iml" filepath="$PROJECT_DIR$/pixel_game_engine.iml" />
     </modules>
   </component>
 </project>

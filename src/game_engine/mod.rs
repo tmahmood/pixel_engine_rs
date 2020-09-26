@@ -92,7 +92,7 @@ pub fn game_loop<T: GameDataModel + PistonGameEvents>(mut app: T, mut game_data:
     while let Some(e) = events.next(&mut game_data.window) {
         if let Some(args) = e.render_args() {
             // get all the drawable
-            let pixels = app.render(&args);
+            let pixels = app.update_game_board(&args);
             let block_width = app.get_block_width();
             let block_height = app.get_block_height();
             let base_rect = rectangle::rectangle_by_corners(
