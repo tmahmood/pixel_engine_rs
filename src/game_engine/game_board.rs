@@ -224,7 +224,8 @@ pub fn draw_polygon(point_list: &Vec<f32>, block: &Block, pixels: &mut PixelMap)
             // we have 2 points, so draw the line
             if p.len() == 4 {
                 draw_line(
-                    p[0], p[1], p[2], p[3], pixels,
+                    block.x + p[0], block.y + p[1],
+                    block.x + p[2], block.y + p[3], pixels,
                     Color::from(block.color),
                 );
                 // only keep last two points

@@ -45,19 +45,19 @@ pub fn draw_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
         match block.shape {
             ShapeKind::Rect => {
                 game_board::draw_rectangle(
-                    k[0], k[1], k[2], k[3], &mut pixels,
+                    block.x + k[0], block.y + k[1], k[2], k[3], &mut pixels,
                     Color::from(block.color),
                 );
             }
             ShapeKind::Circle => {
                 game_board::draw_circle(
-                    k[0], k[1], k[2], &mut pixels,
+                    block.x + k[0], block.y + k[1], k[2], &mut pixels,
                     Color::from(block.color),
                 );
             }
             ShapeKind::Ellipse => {
                 game_board::draw_ellipse(
-                    k[0], k[1], k[2], k[3], &mut pixels,
+                    block.x + k[0], block.y + k[1], k[2], k[3], &mut pixels,
                     Color::from(block.color),
                 );
             }
@@ -66,7 +66,7 @@ pub fn draw_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
             }
             ShapeKind::Line => {
                 game_board::draw_line(
-                    k[0], k[1], k[2], k[3], &mut pixels,
+                    block.x + k[0], block.y + k[1], block.x + k[2], block.y + k[3], &mut pixels,
                     Color::from(block.color),
                 );
             }
