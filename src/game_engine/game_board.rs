@@ -214,11 +214,9 @@ fn draw_straight_line(fixed_axis: f32, _p1: f32, _p2: f32, points: &mut PixelMap
     return;
 }
 
-pub fn draw_polygon(point_list: &Vec<Vec<f32>>, block: &Block, pixels: &mut PixelMap) {
+pub fn draw_polygon(point_list: &Vec<f32>, block: &Block, pixels: &mut PixelMap) {
     let mut p: Vec<f32> = Vec::new();
-    point_list[block.index]
-        // make pairs
-        .chunks(2)
+    point_list.chunks(2)
         // parse through the pairs
         .for_each(|item| {
             // add to point list

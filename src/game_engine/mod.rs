@@ -41,8 +41,6 @@ pub fn init_game_engine(size: [f64; 2], opengl: OpenGL) -> GameEngineData {
 
 pub fn draw_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap {
     let mut pixels: PixelMap = HashMap::new();
-    // draw things, we check what kind of shape we are working with
-    // and draw appropriate shape
     shapes.iter().for_each(|block| {
         let k = &point_list[block.index];
         match block.shape {
@@ -65,11 +63,7 @@ pub fn draw_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
                 );
             }
             ShapeKind::Polygon => {
-                game_board::draw_polygon(
-                    &point_list,
-                    &block,
-                    &mut pixels
-                )
+                game_board::draw_polygon(k, &block, &mut pixels)
             }
             ShapeKind::Line => {
                 game_board::draw_line(
