@@ -17,7 +17,6 @@ use graphics::types::Color;
 use crate::game_engine::game_events::PistonGameEvents;
 
 
-pub mod parse_block_list;
 pub mod game_board;
 pub mod game_events;
 
@@ -89,14 +88,27 @@ pub fn game_loop<T: GameDataModel + PistonGameEvents>(mut app: T, mut game_data:
             let pixels = app.update_game_board(&args);
             let block_width = app.get_block_width();
             let block_height = app.get_block_height();
+            let board_width = app.get_board_width();
+            let board_height = app.get_board_height();
             let base_rect = rectangle::rectangle_by_corners(
                 0.0, 0.0,
                 block_width as f64, block_height as f64,
             );
+            const GRID_COLOR: [f32; 4] = [0.3, 0.3, 0.3, 0.3];
             // doing drawing stuffS
             game_data.gl.draw(args.viewport(), |c, gl| {
                 // Clear the screen.
                 clear(BLACK, gl);
+                let s = (block_width * 2.0) as i32;
+                for ix in (s..board_width as i32).step_by(s as usize) {
+                    let l = [ix as f64, 0.0, ix as f64, board_height as f64];
+                    line(GRID_COLOR, 1.0, l, c.transform, gl);
+                }
+                let s = (block_height * 2.0) as i32;
+                for iy in (s..board_height as i32).step_by(s as usize)  {
+                    let l = [0.0, iy as f64, board_height as f64, iy as f64];
+                    line(GRID_COLOR, 1.0, l, c.transform, gl);
+                }
                 pixels.values().for_each(|pixel| {
                     let transform = c.transform.trans(
                         (pixel.point.x * block_width) as f64,
