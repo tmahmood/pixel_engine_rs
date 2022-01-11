@@ -66,7 +66,9 @@ pub fn draw_shapes(shapes: &Vec<Block>, point_list: &Vec<Vec<f32>>) -> PixelMap 
             }
             ShapeKind::Line => {
                 game_board::draw_line(
-                    block.x + k[0], block.y + k[1], block.x + k[2], block.y + k[3], &mut pixels,
+                    block.x + k[0], block.y + k[1],
+                    block.x + k[2], block.y + k[3],
+                    &mut pixels,
                     Color::from(block.color),
                 );
             }
